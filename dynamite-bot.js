@@ -7,7 +7,9 @@ class Bot {
         this.enemyScore = 0;
         this.movesSoFar = 0;
         this.accumulatedPoints = 0;
+        this.enemyHistory = [];
     }
+
 
     pickCoreMove() {
         const random = Math.floor(Math.random() * this.coreMoves.length);
@@ -19,6 +21,10 @@ class Bot {
             return true;
         }
     }
+
+    // getMoveProbabiltyAfterDraws(numberOfDraws) {
+    //     // const moveHistory = this.enemyHistory[]
+    // }
 
     keepScore(gamestateRounds) {
         //MUST PASS IN THE LAST ROUND
@@ -71,6 +77,13 @@ class Bot {
 
         this.movesSoFar++
 
+        //if enemy has broken run of draws, keep a history of the move
+        if (this.accumulatedPoints > 0) {
+            this.enemyHistory.push({
+                key: this.accumulatedPoints, //Number of draws proceeding this
+                value: currentMove["p2"]
+            })
+        }
     }
 
     makeMove(gamestate) {
@@ -96,44 +109,39 @@ class Bot {
         if(this.isThereDynamiteLeft()){
 
             const turnsPerDynamite = expectedTurnsLeft / this.botNumberOfDynamites
-            //want to use one roughly every 10 turns
             //assume 1/3 chance of draw per play - big assumption? - add chance of both using dynamite?
-
-            // const chanceBotUsesDynamite = 1/ (expectedTurnsLeft / this.enemyNumberOfDynamites)
-
-
             // rough expected length of draws is log base 3 (n (2/3)) where n is number of plays
             const expectedMaxRunOfDraws = Math.round(Math.log(turnsPerDynamite * (2/3))/ Math.log(3))
-            //TODO Do I Math.Round this.......
-
-            console.log(`Expected turns left: ${expectedTurnsLeft}, turns per dynamite: ${turnsPerDynamite}, expectedMaxRun: ${expectedMaxRunOfDraws}`)
 
             if (this.accumulatedPoints >= expectedMaxRunOfDraws) {
                 return "D"
                 //TODO Dynamite everytime? Or only say 1/2 the time
             }
+            // console.log(`Expected turns left: ${expectedTurnsLeft},
+            // turns per dynamite: ${turnsPerDynamite}, expectedMaxRun: ${expectedMaxRunOfDraws}`)
         }
 
-        // keep track of enemy dynamites
+        // Predict enemy moves
+        // keep history of number of ties to corresponding move
 
         return this.pickCoreMove()
     }
 }
 
-let gamestate = {
-    rounds: [
-        {
-            p1: "R",
-            p2: "D"
-        },
-        {
-            p1: "W",
-            p2: "S"
-        }]
-};
-
-const bot = new Bot();
-bot.makeMove(gamestate)
+// let gamestate = {
+//     rounds: [
+//         {
+//             p1: "R",
+//             p2: "D"
+//         },
+//         {
+//             p1: "W",
+//             p2: "S"
+//         }]
+// };
+//
+// const bot = new Bot();
+// bot.makeMove(gamestate)
 
 
 
@@ -159,4 +167,4 @@ bot.makeMove(gamestate)
     // designed to maximise my expected score.
 
 
-// module.exports = new Bot();
+module.exports = new Bot();
