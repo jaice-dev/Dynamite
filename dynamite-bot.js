@@ -33,6 +33,7 @@ class Bot {
         const certaintlyLevel = 0.75
 
         if (Object.keys(this.enemyHistory).length === 0) return null
+        if (numberOfDraws === 0) return null
 
         const movehistory = this.enemyHistory[numberOfDraws]
 
@@ -104,7 +105,6 @@ class Bot {
 
         this.movesSoFar++
 
-        //if enemy has broken run of draws, keep a history of the move
         if (this.accumulatedPoints > 0) {
 
             if (this.accumulatedPoints in this.enemyHistory) {
@@ -163,26 +163,5 @@ class Bot {
         return this.pickCoreMove()
     }
 }
-// 100 sticks of Dynamite
-    // play until one player reaches 1000 points
-    // maximum of 2500 rounds
-
-    // Dynamite
-    // when to use Dynamite. the more ties there have been, the more valuable the dynamite.
-    // calculate how many ties, double ties, triple ties etc there were
-    // likely to be in the remainder of the game, and compared that to the number of
-    // sticks of dynamite I had left to decide whether the current move was valuable
-    // enough to use my dynamite on.
-    // used dynamite about a third of the time that I thought it was worth it.
-    // I think the 1/3rd figure is quite important, because it maximises my own
-    // opportunity to win points, while making it expensive for my opponent to water
-    // balloon me on the off-chance that I use the dynamite.
-
-    // predicting what my opponent would do.
-    // I kept a history of “number of ties => corresponding move”,
-    // and various other combinations of historical factors, which I weighted to predict
-    // the next move. And then based on that prediction, went for an appropriate counter-move
-    // designed to maximise my expected score.
-
 
 module.exports = new Bot();
