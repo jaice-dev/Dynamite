@@ -163,24 +163,6 @@ class Bot {
         return this.pickCoreMove()
     }
 }
-
-let gamestate = {
-    rounds: [
-        {
-            p1: "R",
-            p2: "D"
-        },
-        {
-            p1: "W",
-            p2: "S"
-        }]
-};
-
-const bot = new Bot();
-bot.makeMove(gamestate)
-
-
-
 // 100 sticks of Dynamite
     // play until one player reaches 1000 points
     // maximum of 2500 rounds
