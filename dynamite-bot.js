@@ -1,10 +1,12 @@
 class Bot {
     constructor() {
         this.coreMoves = ["R", "P", "S"];
-        this.numberOfDynamites = 100;
+        this.botNumberOfDynamites = 100;
+        this.enemyNumberOfDynamites = 100;
         this.botScore = 0;
         this.enemyScore = 0;
         this.movesSoFar = 0;
+        this.accumulatedPoints = 0;
     }
 
     pickCoreMove() {
@@ -13,9 +15,60 @@ class Bot {
     }
 
     isThereDynamiteLeft() {
-        if (this.numberOfDynamites > 0) {
+        if (this.botNumberOfDynamites > 0) {
             return true;
         }
+    }
+
+    keepScore(gamestateRounds) {
+        //MUST PASS IN THE LAST ROUND
+        // Updates player and enemy scores for previous rounds
+        // Keeps track of accumulated points
+        // Manages dynamite levels
+
+        let currentMove = gamestateRounds;
+
+        //Draws
+        if ((currentMove["p1"] === "R" && currentMove["p2"] === "R")
+            || (currentMove["p1"] === "P" && currentMove["p2"] === "P")
+            || (currentMove["p1"] === "S" && currentMove["p2"] === "S")
+            || (currentMove["p1"] === "D" && currentMove["p2"] === "D")
+            || (currentMove["p1"] === "W" && currentMove["p2"] === "W")) {
+
+            this.accumulatedPoints++
+
+        }
+
+        //Bot Wins
+        else if ((currentMove["p1"] === "R" && currentMove["p2"] === "S")
+            || (currentMove["p1"] === "P" && currentMove["p2"] === "R")
+            || (currentMove["p1"] === "S" && currentMove["p2"] === "P")
+            || (currentMove["p1"] === "D" && currentMove["p2"] !== "W")
+            || (currentMove["p1"] === "W" && currentMove["p2"] === "D")) {
+
+            this.botScore += 1 + this.accumulatedPoints;
+            this.accumulatedPoints = 0;
+
+        }
+
+        //Enemy Wins
+        else if ((currentMove["p1"] === "R" && currentMove["p2"] === "P")
+            || (currentMove["p1"] === "P" && currentMove["p2"] === "S")
+            || (currentMove["p1"] === "S" && currentMove["p2"] === "R")
+            || (currentMove["p1"] !== "W" && currentMove["p2"] === "D")
+            || (currentMove["p1"] === "D" && currentMove["p2"] === "W")) {
+
+            this.enemyScore += 1 + this.accumulatedPoints;
+            this.accumulatedPoints = 0;
+
+        }
+
+        //Keep track of Dynamites
+        if (currentMove["p1"] === "D") this.botNumberOfDynamites--
+        if (currentMove["p2"] === "D") this.enemyNumberOfDynamites--
+
+        this.movesSoFar++
+
     }
 
     makeMove(gamestate) {
@@ -25,9 +78,22 @@ class Bot {
         // if number of moves left is less than expected chance of n-draws in a row, don't wait to use dynamite there.
         // expected moves left = floor ((1000 - botScore), (1000 - enemyScore), (2500 - movesSoFar)
 
+        for (let i = 0; i < gamestate["rounds"].length; i++) {
+            this.keepScore(gamestate["rounds"][i])
+        }
+        //Normally
+        // this.keepScore(gamestate["rounds"][gamestate["rounds"].length -1])
+
+
+
+        console.log(`Bot dynamites: ${this.botNumberOfDynamites}, 
+        enemy dynamites: ${this.enemyNumberOfDynamites}, 
+        bot score: ${this.botScore}, 
+        enemy score: ${this.enemyScore}, 
+        moves so far ${this.movesSoFar}, 
+        accumulated points: ${this.accumulatedPoints}`)
 
         if (this.isThereDynamiteLeft()) {
-            this.numberOfDynamites--
             return "D"
         }
 
@@ -35,10 +101,30 @@ class Bot {
     }
 }
 
+let gamestate = {
+    rounds: [
+        {
+            p1: "R",
+            p2: "R"
+        },
+        {
+            p1: "W",
+            p2: "W"
+        },
+        {
+            p1: "D",
+            p2: "D"
+        },
+        {
+            p1: "S",
+            p2: "D"
+        }]
+};
+
 const bot = new Bot();
-for (let i=0; i<110; i++) {
-    console.log(bot.makeMove())
-}
+bot.makeMove(gamestate)
+
+
 
 // 100 sticks of Dynamite
     // play until one player reaches 1000 points
@@ -62,16 +148,6 @@ for (let i=0; i<110; i++) {
     // designed to maximise my expected score.
 
 // Form of Gamestate: an array containing each players moves for all previous rounds
-// {rounds: [
-//         {
-//             p1 : "R",
-//             p2 : "D"
-//         },
-//         {
-//             p1 : "W",
-//             p2 : "S"
-//         },
-//         ...]
-// }
+
 
 // module.exports = new Bot();
