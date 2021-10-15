@@ -7,7 +7,7 @@ class Bot {
         this.enemyScore = 0;
         this.movesSoFar = 0;
         this.accumulatedPoints = 0;
-        this.enemyHistory = [];
+        this.enemyHistory = {};
     }
 
 
@@ -22,9 +22,45 @@ class Bot {
         }
     }
 
-    // getMoveProbabiltyAfterDraws(numberOfDraws) {
-    //     // const moveHistory = this.enemyHistory[]
-    // }
+    getMostLikelyWinningMoveAfterDraws(numberOfDraws) {
+
+        let RNumber = 0;
+        let PNumber = 0;
+        let SNumber = 0;
+        let DNumber = 0;
+        let WNumber = 0;
+
+        const certaintlyLevel = 0.75
+
+        const movehistory = this.enemyHistory[numberOfDraws]
+
+
+        // var getMax = function (str) {
+        //     var max = 0,
+        //         maxChar = '';
+        //     str.split('').forEach(function(char){
+        //         if(str.split(char).length > max) {
+        //             max = str.split(char).length;
+        //             maxChar = char;
+        //         }
+        //     });
+
+        for (let i = 0; i < movehistory.length; i++) {
+            if (movehistory[i] === "R") RNumber++
+            if (movehistory[i] === "P") PNumber++
+            if (movehistory[i] === "S") SNumber++
+            if (movehistory[i] === "D") DNumber++
+            if (movehistory[i] === "W") WNumber++
+        }
+
+        if ((RNumber / movehistory.length) > certaintlyLevel) return "P"
+        if ((PNumber / movehistory.length) > certaintlyLevel) return "S"
+        if ((SNumber / movehistory.length) > certaintlyLevel) return "R"
+        if ((DNumber / movehistory.length) > certaintlyLevel) return "W"
+        if ((WNumber / movehistory.length) > certaintlyLevel) return this.pickCoreMove()
+
+        return null
+    }
 
     keepScore(gamestateRounds) {
         //MUST PASS IN THE LAST ROUND
@@ -79,10 +115,12 @@ class Bot {
 
         //if enemy has broken run of draws, keep a history of the move
         if (this.accumulatedPoints > 0) {
-            this.enemyHistory.push({
-                key: this.accumulatedPoints, //Number of draws proceeding this
-                value: currentMove["p2"]
-            })
+
+            if (this.accumulatedPoints in this.enemyHistory) {
+                this.enemyHistory[this.accumulatedPoints] += currentMove["p2"]
+            } else {
+                this.enemyHistory[this.accumulatedPoints] = currentMove["p2"]
+            }
         }
     }
 
@@ -105,6 +143,11 @@ class Bot {
 
         const expectedTurnsLeft = Math.min(((1000 - this.botScore) + (1000 - this.enemyScore)), (2500 - this.movesSoFar));
 
+        let possibleMove = this.getMostLikelyWinningMoveAfterDraws()
+        if (possibleMove != null) {
+            return possibleMove
+        }
+
         //When to use dynamite
         if(this.isThereDynamiteLeft()){
 
@@ -123,6 +166,8 @@ class Bot {
 
         // Predict enemy moves
         // keep history of number of ties to corresponding move
+
+
 
         return this.pickCoreMove()
     }
