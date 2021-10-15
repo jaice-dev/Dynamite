@@ -32,18 +32,9 @@ class Bot {
 
         const certaintlyLevel = 0.75
 
+        if (Object.keys(this.enemyHistory).length === 0) return null
+
         const movehistory = this.enemyHistory[numberOfDraws]
-
-
-        // var getMax = function (str) {
-        //     var max = 0,
-        //         maxChar = '';
-        //     str.split('').forEach(function(char){
-        //         if(str.split(char).length > max) {
-        //             max = str.split(char).length;
-        //             maxChar = char;
-        //         }
-        //     });
 
         for (let i = 0; i < movehistory.length; i++) {
             if (movehistory[i] === "R") RNumber++
@@ -143,7 +134,7 @@ class Bot {
 
         const expectedTurnsLeft = Math.min(((1000 - this.botScore) + (1000 - this.enemyScore)), (2500 - this.movesSoFar));
 
-        let possibleMove = this.getMostLikelyWinningMoveAfterDraws()
+        let possibleMove = this.getMostLikelyWinningMoveAfterDraws(this.accumulatedPoints)
         if (possibleMove != null) {
             return possibleMove
         }
@@ -173,20 +164,20 @@ class Bot {
     }
 }
 
-// let gamestate = {
-//     rounds: [
-//         {
-//             p1: "R",
-//             p2: "D"
-//         },
-//         {
-//             p1: "W",
-//             p2: "S"
-//         }]
-// };
-//
-// const bot = new Bot();
-// bot.makeMove(gamestate)
+let gamestate = {
+    rounds: [
+        {
+            p1: "R",
+            p2: "D"
+        },
+        {
+            p1: "W",
+            p2: "S"
+        }]
+};
+
+const bot = new Bot();
+bot.makeMove(gamestate)
 
 
 
