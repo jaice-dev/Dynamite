@@ -106,7 +106,7 @@ class Bot {
         this.movesSoFar++
 
         if (this.accumulatedPoints > 0) {
-
+            // Add move following a draw to enemyHistory
             if (this.accumulatedPoints in this.enemyHistory) {
                 this.enemyHistory[this.accumulatedPoints] += currentMove["p2"]
             } else {
@@ -117,49 +117,35 @@ class Bot {
 
     makeMove(gamestate) {
 
-        // KeepScore testing
-        // for (let i = 0; i < gamestate["rounds"].length; i++) {
-        //     this.keepScore(gamestate["rounds"][i])
-        // }
-        // console.log(`Bot dynamites: ${this.botNumberOfDynamites},
-        // enemy dynamites: ${this.enemyNumberOfDynamites},
-        // bot score: ${this.botScore},
-        // enemy score: ${this.enemyScore},
-        // moves so far ${this.movesSoFar},
-        // accumulated points: ${this.accumulatedPoints}`)
-
         if (gamestate["rounds"].length !== 0) {
             this.keepScore(gamestate["rounds"][gamestate["rounds"].length -1])
         }
 
         const expectedTurnsLeft = Math.min(((1000 - this.botScore) + (1000 - this.enemyScore)), (2500 - this.movesSoFar));
 
+        //If there is a predicted move above set confidence level, return it
         let possibleMove = this.getMostLikelyWinningMoveAfterDraws(this.accumulatedPoints)
         if (possibleMove != null) {
             return possibleMove
         }
 
-        //When to use dynamite
+        //Otherwise, play as normal
+        //When to use dynamite:
         if(this.isThereDynamiteLeft()){
 
             const turnsPerDynamite = expectedTurnsLeft / this.botNumberOfDynamites
             //assume 1/3 chance of draw per play - big assumption? - add chance of both using dynamite?
             // rough expected length of draws is log base 3 (n (2/3)) where n is number of plays
+            // See https://math.stackexchange.com/questions/1409372/what-is-the-expected-length-of-the-largest-run-of-heads-if-we-make-1-000-flips
             const expectedMaxRunOfDraws = Math.round(Math.log(turnsPerDynamite * (2/3))/ Math.log(3))
 
             if (this.accumulatedPoints >= expectedMaxRunOfDraws) {
                 return "D"
                 //TODO Dynamite everytime? Or only say 1/2 the time
             }
-            // console.log(`Expected turns left: ${expectedTurnsLeft},
-            // turns per dynamite: ${turnsPerDynamite}, expectedMaxRun: ${expectedMaxRunOfDraws}`)
         }
 
-        // Predict enemy moves
-        // keep history of number of ties to corresponding move
-
-
-
+        //pick random move
         return this.pickCoreMove()
     }
 }
