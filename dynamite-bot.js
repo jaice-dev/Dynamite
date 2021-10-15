@@ -44,7 +44,8 @@ class Bot {
             || (currentMove["p1"] === "P" && currentMove["p2"] === "R")
             || (currentMove["p1"] === "S" && currentMove["p2"] === "P")
             || (currentMove["p1"] === "D" && currentMove["p2"] !== "W")
-            || (currentMove["p1"] === "W" && currentMove["p2"] === "D")) {
+            || (currentMove["p1"] === "W" && currentMove["p2"] === "D")
+            || ((currentMove["p1"] === "R" || currentMove["p1"] === "P" || currentMove["p1"] === "S") && currentMove["p2"] === "W")) {
 
             this.botScore += 1 + this.accumulatedPoints;
             this.accumulatedPoints = 0;
@@ -56,7 +57,8 @@ class Bot {
             || (currentMove["p1"] === "P" && currentMove["p2"] === "S")
             || (currentMove["p1"] === "S" && currentMove["p2"] === "R")
             || (currentMove["p1"] !== "W" && currentMove["p2"] === "D")
-            || (currentMove["p1"] === "D" && currentMove["p2"] === "W")) {
+            || (currentMove["p1"] === "D" && currentMove["p2"] === "W")
+            || (currentMove["p1"] === "W" && (currentMove["p2"] === "R" || currentMove["p2"] === "P" || currentMove["p2"] === "S"))) {
 
             this.enemyScore += 1 + this.accumulatedPoints;
             this.accumulatedPoints = 0;
@@ -78,13 +80,14 @@ class Bot {
         // if number of moves left is less than expected chance of n-draws in a row, don't wait to use dynamite there.
         // expected moves left = floor ((1000 - botScore), (1000 - enemyScore), (2500 - movesSoFar)
 
-        for (let i = 0; i < gamestate["rounds"].length; i++) {
-            this.keepScore(gamestate["rounds"][i])
+        // KeepScore testing
+        // for (let i = 0; i < gamestate["rounds"].length; i++) {
+        //     this.keepScore(gamestate["rounds"][i])
+        // }
+
+        if (gamestate["rounds"].length !== 0) {
+            this.keepScore(gamestate["rounds"][gamestate["rounds"].length -1])
         }
-        //Normally
-        // this.keepScore(gamestate["rounds"][gamestate["rounds"].length -1])
-
-
 
         console.log(`Bot dynamites: ${this.botNumberOfDynamites}, 
         enemy dynamites: ${this.enemyNumberOfDynamites}, 
@@ -105,19 +108,11 @@ let gamestate = {
     rounds: [
         {
             p1: "R",
-            p2: "R"
+            p2: "D"
         },
         {
             p1: "W",
-            p2: "W"
-        },
-        {
-            p1: "D",
-            p2: "D"
-        },
-        {
-            p1: "S",
-            p2: "D"
+            p2: "S"
         }]
 };
 
