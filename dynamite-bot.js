@@ -75,30 +75,46 @@ class Bot {
 
     makeMove(gamestate) {
 
-        // Chance of n draws in a row is (1/3)^n
-        // expected n-draws in a row is (number of moves left) * (1/3)^n
-        // if number of moves left is less than expected chance of n-draws in a row, don't wait to use dynamite there.
-        // expected moves left = floor ((1000 - botScore), (1000 - enemyScore), (2500 - movesSoFar)
-
         // KeepScore testing
         // for (let i = 0; i < gamestate["rounds"].length; i++) {
         //     this.keepScore(gamestate["rounds"][i])
         // }
+        // console.log(`Bot dynamites: ${this.botNumberOfDynamites},
+        // enemy dynamites: ${this.enemyNumberOfDynamites},
+        // bot score: ${this.botScore},
+        // enemy score: ${this.enemyScore},
+        // moves so far ${this.movesSoFar},
+        // accumulated points: ${this.accumulatedPoints}`)
 
         if (gamestate["rounds"].length !== 0) {
             this.keepScore(gamestate["rounds"][gamestate["rounds"].length -1])
         }
 
-        console.log(`Bot dynamites: ${this.botNumberOfDynamites}, 
-        enemy dynamites: ${this.enemyNumberOfDynamites}, 
-        bot score: ${this.botScore}, 
-        enemy score: ${this.enemyScore}, 
-        moves so far ${this.movesSoFar}, 
-        accumulated points: ${this.accumulatedPoints}`)
+        const expectedTurnsLeft = Math.min(((1000 - this.botScore) + (1000 - this.enemyScore)), (2500 - this.movesSoFar));
 
-        if (this.isThereDynamiteLeft()) {
-            return "D"
+        //When to use dynamite
+        if(this.isThereDynamiteLeft()){
+
+            const turnsPerDynamite = expectedTurnsLeft / this.botNumberOfDynamites
+            //want to use one roughly every 10 turns
+            //assume 1/3 chance of draw per play - big assumption? - add chance of both using dynamite?
+
+            // const chanceBotUsesDynamite = 1/ (expectedTurnsLeft / this.enemyNumberOfDynamites)
+
+
+            // rough expected length of draws is log base 3 (n (2/3)) where n is number of plays
+            const expectedMaxRunOfDraws = Math.round(Math.log(turnsPerDynamite * (2/3))/ Math.log(3))
+            //TODO Do I Math.Round this.......
+
+            console.log(`Expected turns left: ${expectedTurnsLeft}, turns per dynamite: ${turnsPerDynamite}, expectedMaxRun: ${expectedMaxRunOfDraws}`)
+
+            if (this.accumulatedPoints >= expectedMaxRunOfDraws) {
+                return "D"
+                //TODO Dynamite everytime? Or only say 1/2 the time
+            }
         }
+
+        // keep track of enemy dynamites
 
         return this.pickCoreMove()
     }
@@ -141,8 +157,6 @@ bot.makeMove(gamestate)
     // and various other combinations of historical factors, which I weighted to predict
     // the next move. And then based on that prediction, went for an appropriate counter-move
     // designed to maximise my expected score.
-
-// Form of Gamestate: an array containing each players moves for all previous rounds
 
 
 // module.exports = new Bot();
