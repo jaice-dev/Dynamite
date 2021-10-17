@@ -140,8 +140,8 @@ class Bot {
             const expectedMaxRunOfDraws = Math.round(Math.log(turnsPerDynamite * (2/3))/ Math.log(3))
 
             if (this.accumulatedPoints >= expectedMaxRunOfDraws) {
-                return "D"
-                //TODO Dynamite everytime? Or only say 1/2 the time
+                if (Math.random() >= 0.5)
+                    return "D"
             }
         }
 
