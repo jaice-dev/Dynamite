@@ -30,7 +30,7 @@ class Bot {
         let DNumber = 0;
         let WNumber = 0;
 
-        const certaintlyLevel = 0.75
+        const certaintlyLevel = 0.50
 
         if (Object.keys(this.enemyHistory).length === 0) return null
         if (numberOfDraws === 0) return null
@@ -126,7 +126,7 @@ class Bot {
         //If there is a predicted move above set confidence level, return it
         let possibleMove = this.getMostLikelyWinningMoveAfterDraws(this.accumulatedPoints)
         if (possibleMove != null) {
-            return possibleMove
+            if (Math.random() >= 0.01) return possibleMove
         }
 
         //Otherwise, play as normal
@@ -140,8 +140,7 @@ class Bot {
             const expectedMaxRunOfDraws = Math.round(Math.log(turnsPerDynamite * (2/3))/ Math.log(3))
 
             if (this.accumulatedPoints >= expectedMaxRunOfDraws) {
-                if (Math.random() >= 0.5)
-                    return "D"
+                if (Math.random() >= 0.49) return "D"
             }
         }
 
